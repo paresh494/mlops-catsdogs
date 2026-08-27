@@ -1,0 +1,87 @@
+name: CD
+
+# M4: Continuous Deployment. Runs after CI succeeds on main. Pulls the freshly
+# built image from GHCR, (re)deploys the service, and runs a post-deploy smoke
+# test that FAILS the pipeline if health/prediction checks fail.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy-compose:
+    name: Deploy (Docker Compose) + smoke test
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve image tag
+        id: img
+        run: echo "image=${REGISTRY}/${IMAGE_NAME}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Pull new image
+        run: docker pull ${{ steps.img.outputs.image }}
+
+      - name: Deploy / update service
+        env:
+          IMAGE: ${{ steps.img.outputs.image }}
+        run: docker compose -f deploy/docker-compose.yml up -d --no-build inference
+
+      - name: Post-deploy smoke test
+        run: bash scripts/smoke_test.sh http://localhost:8000
+
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose -f deploy/docker-compose.yml logs inference
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down
+
+  deploy-k8s:
+    name: Deploy (Kubernetes / GitOps) + smoke test
+    # Enable by setting repo variable ENABLE_K8S_DEPLOY=true and adding the
+    # KUBE_CONFIG secret (base64 kubeconfig for kind/minikube/microk8s or a VM).
+    if: ${{ vars.ENABLE_K8S_DEPLOY == 'true' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p "$HOME/.kube"
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > "$HOME/.kube/config"
+
+      - name: Set image and apply manifests
+        run: |
+          IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          SHA_TAG="sha-${{ github.sha }}"
+          cd deploy/k8s
+          kubectl kustomize . | sed "s#ghcr.io/OWNER/mlops-catsdogs:latest#${IMAGE}:${SHA_TAG}#g" | kubectl apply -f -
+          kubectl rollout status deployment/catsdogs-inference --timeout=120s
+
+      - name: Post-deploy smoke test
+        run: |
+          kubectl port-forward svc/catsdogs-inference 8000:80 &
+          sleep 5
+          bash scripts/smoke_test.sh http://localhost:8000

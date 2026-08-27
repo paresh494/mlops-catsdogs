@@ -1,0 +1,29 @@
+# DVC pipeline (M1 task 1). Reproduce end-to-end with:  dvc repro
+stages:
+  preprocess:
+    cmd: python -m mlops_catsdogs.data.preprocess
+    deps:
+      - data/raw
+      - src/mlops_catsdogs/data/preprocess.py
+    params:
+      - preprocess
+    outs:
+      - data/processed
+
+  train:
+    cmd: python -m mlops_catsdogs.train --epochs ${train.epochs} --batch-size ${train.batch_size} --learning-rate ${train.learning_rate}
+    deps:
+      - data/processed
+      - src/mlops_catsdogs/train.py
+      - src/mlops_catsdogs/model
+    params:
+      - train
+    outs:
+      - models/model.pt
+    metrics:
+      - metrics/test_metrics.json:
+          cache: false
+    plots:
+      - metrics/confusion_matrix.png
+      - metrics/loss_curve.png
+      - metrics/accuracy_curve.png

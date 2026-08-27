@@ -1,0 +1,12 @@
+-r requirements.txt
+
+# testing
+pytest==7.4.0
+pytest-cov==4.1.0
+httpx==0.28.1
+
+# data versioning
+dvc==3.67.1
+
+# linting (optional, used by the CI lint step)
+ruff==0.6.9

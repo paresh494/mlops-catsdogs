@@ -1,0 +1,29 @@
+# Runtime dependencies for the inference service + training pipeline.
+# Versions are pinned for reproducibility (M2 task 2).
+#
+# torch is the CPU build. In Docker (linux) it is installed from the PyTorch CPU
+# index -- see Dockerfile / CI. On macOS/arm the default PyPI wheel is CPU already.
+
+# --- ML / model ---
+torch==2.9.0
+numpy==1.26.4
+pillow==10.2.0
+scikit-learn==1.2.2
+
+# --- experiment tracking ---
+mlflow==3.14.0
+
+# --- inference service ---
+fastapi==0.139.0
+uvicorn[standard]==0.38.0
+pydantic==2.12.4
+python-multipart==0.0.32
+
+# --- monitoring ---
+prometheus-client==0.14.1
+
+# --- plotting artifacts (confusion matrix / loss curves) ---
+matplotlib==3.7.3
+
+# --- misc ---
+requests==2.32.5

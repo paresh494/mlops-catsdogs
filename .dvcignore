@@ -1,0 +1,4 @@
+# Patterns DVC should not track/hash
+*.pyc
+__pycache__/
+.DS_Store

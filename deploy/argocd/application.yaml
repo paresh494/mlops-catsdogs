@@ -1,0 +1,22 @@
+# Optional GitOps path (M4 task 2): Argo CD watches deploy/k8s and auto-syncs
+# whenever the CD pipeline commits a new image tag to the manifests.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: catsdogs-inference
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/OWNER/mlops-catsdogs.git
+    targetRevision: main
+    path: deploy/k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: catsdogs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

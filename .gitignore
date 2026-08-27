@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Testing / tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# MLflow (local backends)
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Data & models are versioned with DVC, not Git
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/models/*
+!/models/.gitkeep
+*.pt
+*.h5
+*.pkl
+
+# Generated metrics / reports
+/metrics/
+/assets/*.jpg
+
+# DVC local remote (blob store) and cache
+/.dvcstore/
+/.dvc/cache/
+/mlartifacts_export/
+/dist/
+
+# OS
+.DS_Store

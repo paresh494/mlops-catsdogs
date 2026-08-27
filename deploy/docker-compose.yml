@@ -1,0 +1,31 @@
+# Docker Compose deployment target (M4 task 1) + monitoring stack (M5 task 1).
+# Usage:
+#   IMAGE=ghcr.io/<owner>/mlops-catsdogs:latest docker compose -f deploy/docker-compose.yml up -d
+services:
+  inference:
+    image: ${IMAGE:-mlops-catsdogs:local}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: catsdogs-inference
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/app/models/model.pt
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: catsdogs-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - inference
+    restart: unless-stopped
