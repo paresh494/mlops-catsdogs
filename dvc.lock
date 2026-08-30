@@ -28,7 +28,7 @@ stages:
       size: 514458828
       nfiles: 24999
   train:
-    cmd: python -m mlops_catsdogs.train --epochs 1 --batch-size 32 --learning-rate
+    cmd: python -m mlops_catsdogs.train --epochs 8 --batch-size 64 --learning-rate
       0.01
     deps:
     - path: data/processed
@@ -48,25 +48,25 @@ stages:
     params:
       params.yaml:
         train:
-          epochs: 1
-          batch_size: 32
+          epochs: 8
+          batch_size: 64
           learning_rate: 0.01
           weight_decay: 1e-06
           seed: 42
     outs:
     - path: metrics/accuracy_curve.png
       hash: md5
-      md5: c872decd2fa67f3f6c6db66f9b013fc8
-      size: 16865
+      md5: 3f7ce54abbd60e73a14e95ecfc6cce30
+      size: 31220
     - path: metrics/confusion_matrix.png
       hash: md5
-      md5: 5917989491f13b46d354172b8d21d05b
-      size: 18411
+      md5: c2278cb0635f0ff18b8bbcfafbd15c13
+      size: 17481
     - path: metrics/loss_curve.png
       hash: md5
-      md5: 9a66518ab23629fbf8410a5a563995f3
-      size: 13469
+      md5: daee16913f68bed4fcc3cc8e1c3a2816
+      size: 31915
     - path: metrics/test_metrics.json
       hash: md5
-      md5: 974e631ad08a7eba2153f51a27ef9b36
-      size: 183
+      md5: d2fa520f0141c8895eeee415b478105f
+      size: 184

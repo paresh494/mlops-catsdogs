@@ -8,8 +8,8 @@ preprocess:
   seed: 42
 
 train:
-  epochs: 1
-  batch_size: 32
+  epochs: 8
+  batch_size: 64
   learning_rate: 0.01
   weight_decay: 0.000001
   seed: 42
