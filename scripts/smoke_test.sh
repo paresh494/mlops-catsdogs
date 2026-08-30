@@ -33,14 +33,13 @@ echo "${HEALTH}" | grep -q '"status":"ok"' || { echo "[smoke] FAIL: bad health p
 
 # 3. prediction assertion
 if [ ! -f "${SAMPLE_IMAGE}" ]; then
-  echo "[smoke] generating a sample image"
-  python - <<'PY'
-import numpy as np, pathlib
-from PIL import Image
-pathlib.Path("assets").mkdir(exist_ok=True)
-arr = np.random.default_rng(0).integers(0, 256, (128, 128, 3), dtype=np.uint8)
-Image.fromarray(arr, "RGB").save("assets/sample_dog.jpg")
-PY
+  echo "[smoke] ${SAMPLE_IMAGE} missing -> writing a tiny embedded JPEG (no python deps)"
+  mkdir -p "$(dirname "${SAMPLE_IMAGE}")"
+  base64 -d > "${SAMPLE_IMAGE}" <<'B64'
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////
+////////////////////////////////////////////////////////wAALCAAQABABAREA/8QA
+FAABAAAAAAAAAAAAAAAAAAAAAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAT8AN//Z
+B64
 fi
 
 PRED="$(curl -fsS -X POST "${BASE_URL}/predict" -F "file=@${SAMPLE_IMAGE};type=image/jpeg")"
