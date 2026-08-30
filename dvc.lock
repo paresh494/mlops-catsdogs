@@ -1,0 +1,76 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python -m mlops_catsdogs.data.preprocess
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 0c3087faf781674b569a84f0a8865ad8.dir
+      size: 848866410
+      nfiles: 24999
+    - path: src/mlops_catsdogs/data/preprocess.py
+      hash: md5
+      md5: f08eef29af1218193d03e73c80e65173
+      size: 5022
+    params:
+      params.yaml:
+        preprocess:
+          image_size: 224
+          split:
+            train: 0.8
+            val: 0.1
+            test: 0.1
+          seed: 42
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 2d70fa31ea2d46c9fc7ccb87c9448bce.dir
+      size: 514458828
+      nfiles: 24999
+  train:
+    cmd: python -m mlops_catsdogs.train --epochs 5 --batch-size 32 --learning-rate
+      0.001
+    deps:
+    - path: data/processed
+      hash: md5
+      md5: 2d70fa31ea2d46c9fc7ccb87c9448bce.dir
+      size: 514458828
+      nfiles: 24999
+    - path: src/mlops_catsdogs/model
+      hash: md5
+      md5: 604b7db53658f8d537cdf7972a497040.dir
+      size: 4652
+      nfiles: 3
+    - path: src/mlops_catsdogs/train.py
+      hash: md5
+      md5: bf06f2389dda1243b555c1d95d1211a3
+      size: 9062
+    params:
+      params.yaml:
+        train:
+          epochs: 5
+          batch_size: 32
+          learning_rate: 0.001
+          weight_decay: 0.0001
+          seed: 42
+    outs:
+    - path: metrics/accuracy_curve.png
+      hash: md5
+      md5: 7aee4d8284dba073ab3e04d88414ae53
+      size: 31738
+    - path: metrics/confusion_matrix.png
+      hash: md5
+      md5: d3ce27143f42a78a3362b22f02bcdf70
+      size: 17299
+    - path: metrics/loss_curve.png
+      hash: md5
+      md5: 26e6629fd691288cbde4c129e1440f65
+      size: 33073
+    - path: metrics/test_metrics.json
+      hash: md5
+      md5: 298b3337049fd59060c3ad4938f43441
+      size: 187
+    - path: models/model.pt
+      hash: md5
+      md5: c9d3d680f73f201e0a2eadd30d955b79
+      size: 403521
