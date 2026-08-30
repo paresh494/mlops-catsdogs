@@ -94,7 +94,8 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          tags: catsdogs:ci
+          # tag only for the PR `type=docker` load; a digest-only push must be untagged.
+          tags: ${{ github.event_name == 'pull_request' && 'catsdogs:ci' || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=${{ env.PLATFORM_PAIR }}
