@@ -70,7 +70,3 @@ stages:
       hash: md5
       md5: 298b3337049fd59060c3ad4938f43441
       size: 187
-    - path: models/model.pt
-      hash: md5
-      md5: c9d3d680f73f201e0a2eadd30d955b79
-      size: 403521

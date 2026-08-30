@@ -26,11 +26,11 @@ mlflow.db
 # data/processed is a DVC pipeline output (whole dir) -> nothing under it may be
 # tracked by Git, not even .gitkeep, or `dvc repro` fails.
 /data/processed
-# models/: the dir is kept (Dockerfile COPYs it) but its contents are ignored.
-# The DVC output is the file models/model.pt, so a tracked .gitkeep is fine.
+# models/: the trained checkpoint is committed to Git so it is baked into the
+# Docker image for real inference. Any other files under models/ stay ignored.
 /models/*
 !/models/.gitkeep
-*.pt
+!/models/model.pt
 *.h5
 *.pkl
 

@@ -18,8 +18,9 @@ stages:
       - src/mlops_catsdogs/model
     params:
       - train
-    outs:
-      - models/model.pt
+    # models/model.pt is intentionally NOT a DVC output: it is committed to Git
+    # so the Docker image bakes it in for real inference. The stage still tracks
+    # metrics and plots below.
     metrics:
       - metrics/test_metrics.json:
           cache: false

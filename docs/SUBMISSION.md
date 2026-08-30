@@ -23,7 +23,7 @@ Contents:
 
 ### M1 — Model Development & Experiment Tracking (10)
 - **Data & code versioning** — Git history; `dvc.yaml` (2-stage pipeline), `data/raw.dvc`, `params.yaml`.
-- **Model building** — `src/mlops_catsdogs/model/cnn.py` (`SimpleCNN`); serialized to `models/model.pt`.
+- **Model building** — `src/mlops_catsdogs/model/cnn.py` (`SimpleCNN`); serialized to `models/model.pt`. The checkpoint is committed to Git (not a DVC output) so it is baked into the Docker image for real inference; the raw dataset and `data/processed` remain DVC-tracked.
 - **Experiment tracking** — `src/mlops_catsdogs/train.py` logs params, per-epoch metrics, test metrics, and artifacts to MLflow. Show `mlflow ui --backend-store-uri sqlite:///mlflow.db`.
 
 ### M2 — Packaging & Containerization (10)
