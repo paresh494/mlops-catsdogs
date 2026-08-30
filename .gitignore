@@ -23,10 +23,13 @@ mlflow.db
 # Data & models are versioned with DVC, not Git
 /data/raw/*
 !/data/raw/.gitkeep
-# data/processed and models/ are DVC pipeline outputs -> nothing under them may be
-# tracked by Git (not even .gitkeep), or `dvc repro` fails.
+# data/processed is a DVC pipeline output (whole dir) -> nothing under it may be
+# tracked by Git, not even .gitkeep, or `dvc repro` fails.
 /data/processed
-/models
+# models/: the dir is kept (Dockerfile COPYs it) but its contents are ignored.
+# The DVC output is the file models/model.pt, so a tracked .gitkeep is fine.
+/models/*
+!/models/.gitkeep
 *.pt
 *.h5
 *.pkl
